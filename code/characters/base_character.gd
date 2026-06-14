@@ -38,7 +38,9 @@ func _on_area_2d_area_entered(area):
 	await timer.timeout
 	if not zone.overlaps_area(area): return
 	var x = area.get_parent()
-	if sub: timer.start((2.5 - randf_range(0.0,0.25)) - (attack_speed/10))
+	if sub:
+		timer.start((2.5 - randf_range(0.0,0.25)) - (attack_speed/10))
+		await timer.timeout
 	else: x.sub = true
 	hit_graphic.look_at(area.global_position)
 	hit_graphic.visible = true
@@ -55,6 +57,10 @@ func fight(area: Area2D, x: Node):
 	await timer.timeout
 	print(sub)
 	if not zone.overlaps_area(area): return
+	hit_graphic.look_at(area.global_position)
+	hit_graphic.visible = true
+	await get_tree().create_timer(0.0675).timeout
+	hit_graphic.visible = false
 	x.health.text = str(int(x.health.text) - damage)
 	if int(x.health.text) < 1:
 		x.queue_free()
