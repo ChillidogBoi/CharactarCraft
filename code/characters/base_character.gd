@@ -44,7 +44,9 @@ func _on_area_2d_area_entered(area):
 	else: x.sub = true
 	hit_graphic.look_at(area.global_position)
 	hit_graphic.visible = true
-	await get_tree().create_timer(0.0675).timeout
+	await get_tree().create_timer(0.025).timeout
+	x.hit.emit()
+	await get_tree().create_timer(0.025).timeout
 	hit_graphic.visible = false
 	x.health.text = str(int(x.health.text) - damage)
 	if int(x.health.text) < 1:
@@ -59,7 +61,9 @@ func fight(area: Area2D, x: Node):
 	if not zone.overlaps_area(area): return
 	hit_graphic.look_at(area.global_position)
 	hit_graphic.visible = true
-	await get_tree().create_timer(0.0675).timeout
+	await get_tree().create_timer(0.025).timeout
+	x.hit.emit()
+	await get_tree().create_timer(0.025).timeout
 	hit_graphic.visible = false
 	x.health.text = str(int(x.health.text) - damage)
 	if int(x.health.text) < 1:
@@ -71,4 +75,8 @@ func fight(area: Area2D, x: Node):
 func _on_hit():
 	sprite.modulate = Color(0,0,0,0)
 	await get_tree().create_timer(0.0675).timeout
+	sprite.modulate = Color(1,1,1,1)
+	await get_tree().create_timer(0.025).timeout
+	sprite.modulate = Color(0,0,0,0)
+	await get_tree().create_timer(0.025).timeout
 	sprite.modulate = Color(1,1,1,1)
