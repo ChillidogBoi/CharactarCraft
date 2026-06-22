@@ -1,6 +1,6 @@
-extends Area2D
+extends Area3D
 
-var parent: CharacterBody2D
+var parent: CharacterBody3D
 
 func _ready():
 	parent = get_parent()

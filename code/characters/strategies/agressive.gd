@@ -1,35 +1,30 @@
 extends Strategy
 
 func physics_function(delta: float):
-	var a: Array[Node2D] = parent.scanner.get_overlapping_bodies()
+	var a: Array[Node3D] = parent.scanner.get_overlapping_bodies()
 	
-	if int(parent.health.text) < parent.max_health / 8:
+	if parent.health < 4:
 		for n in a:
-			if n is Upgrade:
+			if n is CharacterBody3D and not n == parent:
 				parent.slow = 0
-				get_parent().nav.target_position = n.global_position
-				return
-		for n in a:
-			if n is CharacterBody2D and not n == parent:
-				parent.slow = 0
-				var p = (Vector2.ZERO - (n.global_position - parent.global_position)).normalized()
+				var p = (Vector3.ZERO - (n.global_position - parent.global_position)).normalized()
 				parent.tester.global_position = p * (parent.look_dist + 32)
 				# wall
 				if parent.tester.get_overlapping_bodies() != []:
 					evade()
 					return
 				# floor
-				if parent.tester2.get_overlapping_bodies() == []:
+				if not parent.tester2.is_colliding():
 					evade()
 					return
-				parent.nav.target_position = p * (parent.look_dist + 32)
+				parent.nav.target_position = p * (parent.look_dist + 2)
 				return
 	
 	if parent.is_in_fight: return
 	
 	# agressively charge characters
 	for n in a:
-		if n is CharacterBody2D and not n == parent:
+		if n is CharacterBody3D and not n == parent:
 			parent.slow = 0
 			get_parent().nav.target_position = n.global_position
 			return
@@ -42,37 +37,34 @@ func physics_function(delta: float):
 			get_parent().nav.target_position = n.global_position
 			return
 	
-	if not parent.nav.is_target_reached(): return
+	if not parent.nav.is_navigation_finished():
+		return
+	
 	
 	# upgrades are low priority
-	for n in a:
-		if n is Upgrade:
-			parent.slow = 0
-			get_parent().nav.target_position = n.global_position
-			return
 	
 	# wander
-	if int(parent.health.text) > (parent.max_health / 8) - 1: parent.slow = parent.speed / 2
-	var loc: Vector2 = Vector2(randi_range(-2, 2), randi_range(-2, 2)) * 160
+	if parent.health > (parent.max_health / 8) - 1: parent.slow = parent.speed / 7.0
+	var loc: Vector3 = Vector3(randi_range(-2, 2), 1, randi_range(-2, 2)) * 20
 	parent.tester.global_position = loc + parent.global_position
+	parent.tester.global_position.y = 0
 	# wall
 	if parent.tester.get_overlapping_bodies() != []: return
 	# floor
-	if parent.tester2.get_overlapping_bodies() == []: return
-	print(loc + parent.global_position)
+	if not parent.tester2.is_colliding(): return
 	get_parent().nav.target_position = loc + parent.global_position
+	
 
 func evade():
 	if not parent.nav.is_target_reached(): return
 	while true:
 		for n: int in 64:
-			var loc: Vector2 = Vector2(randi_range(-3, 3), randi_range(-3, 3)) * 64
+			var loc: Vector3 = Vector3(randi_range(-3, 3), 1, randi_range(-3, 3)) * 10
 			parent.tester.global_position = loc + parent.global_position
 			# wall
 			if parent.tester.get_overlapping_bodies() == [] and\
-				parent.tester2.get_overlapping_bodies() != [] and\
-					loc.distance_to(parent.global_position) > 128:
-						print(loc + parent.global_position)
+				parent.tester2.is_colliding() and\
+					abs(loc.distance_to(parent.global_position)) > 30:
 						get_parent().nav.target_position = loc + parent.global_position
 						return
 		await get_tree().create_timer(0).timeout
