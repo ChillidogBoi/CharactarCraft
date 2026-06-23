@@ -3,7 +3,7 @@ extends Strategy
 func physics_function(delta: float):
 	var a: Array[Node3D] = parent.scanner.get_overlapping_bodies()
 	
-	if parent.health < 4:
+	if parent.health < parent.damage * 2:
 		for n in a:
 			if n is CharacterBody3D and not n == parent:
 				parent.slow = 0
@@ -44,7 +44,7 @@ func physics_function(delta: float):
 	# upgrades are low priority
 	
 	# wander
-	if parent.health > (parent.max_health / 8) - 1: parent.slow = parent.speed / 7.0
+	if parent.health > parent.damage * 2: parent.slow = parent.speed / 7.0
 	var loc: Vector3 = Vector3(randi_range(-2, 2), 1, randi_range(-2, 2)) * 20
 	parent.tester.global_position = loc + parent.global_position
 	parent.tester.global_position.y = 0

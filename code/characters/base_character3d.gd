@@ -63,8 +63,8 @@ func _physics_process(delta):
 		nav.target_position = global_position + get_wall_normal()
 		stuck_counter = 0.0
 	
-	var lll = Vector3(nav.get_next_path_position().x, 0, nav.get_next_path_position().z)
-	var dir = to_local(lll).normalized()
+#	var lll = Vector3(nav.get_next_path_position().x, 0, nav.get_next_path_position().z)
+	var dir = to_local(nav.get_next_path_position()).normalized()
 	velocity = dir * (speed - slow) * delta
 	move_and_slide()
 
